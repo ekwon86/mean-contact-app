@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { BlogService } from '../../services/blog.service';
 
 @Component({
   selector: 'app-blog',
@@ -18,7 +19,8 @@ export class BlogComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private blogService: BlogService
   ) {
     this.createNewBlogForm();
   }
@@ -86,6 +88,24 @@ export class BlogComponent implements OnInit {
       body: this.form.get('body').value,
       createdBy: this.username
     };
+    this.blogService.newBlog(blog).subscrobe(data => {
+      if (!data.success) {
+        this.messageClass = 'alert alert-danger';
+        this.message = data.message;
+        this.processing = false;
+        this.enableFormNewBlogForm();
+      } else {
+        this.messageClass = 'alert alert-success';
+        this.message = data.message;
+        setTimeout(() => {
+          this.newPost = false;
+          this.processing = false;
+          this.message = false;
+          this.form.reset();
+          this.enableFormNewBlogForm();
+        }, 2000);
+      }
+    });
   }
 
   ngOnInit() {
