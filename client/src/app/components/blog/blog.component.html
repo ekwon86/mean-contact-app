@@ -12,6 +12,21 @@
 <br/>
 <br/>
 
+<!-- New Blog Form -->
+<form [formGroup]="form" name="blogForm" (submit)="onBlogSubmit()"  *ngIf="newPost">
+  <div class="form-group">
+    <label for="title">Title</label>
+    <div [ngClass]="{'has-success': form.controls.title.valid, 'has-error': form.controls.title.dirty && form.controls.title.errors }">
+      <input type="text" name="title" class="form-control" placeholder="Blog Title" autocomplete="off" formControlName="title">
+      <ul class="help-block">
+        <li *ngIf="form.controls.title.dirty && form.controls.title.errors?.required">This field is required</li>
+        <li *ngIf="(form.controls.title.dirty && form.controls.title.errors?.minLength) || (form.controls.title.dirty && form.controls.title.errors?.maxLength)">Max length: 50, Min length: 5</li>
+        <li *ngIf="form.controls.title.dirty && form.controls.title.errors?.alphaNumericValidation">Must only contain alphanumeric characters</li>
+      </ul>
+    </div>
+  </div>
+</form>
+
 <div *ngIf="!newPost">
   <div class="panel panel-primary">
     <div class="panel-heading">
