@@ -28,6 +28,7 @@ app.use(bodyParser.urlencoded({ extended: false })); // parse application/x-www-
 app.use(bodyParser.json()); // parse application/json
 app.use(express.static(__dirname + '/client/dist/')); // Provide static directory for frontend
 app.use('/authentication', authentication);
+app.use('/blogs', blogs);
 
 // Connect server to Angular 2 Index.html
 app.get('*', (req, res) => {
