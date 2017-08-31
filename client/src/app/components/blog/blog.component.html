@@ -1,0 +1,41 @@
+<h1 class="page-header">Blog Feed</h1>
+
+<!--<div class="row show-hide-message">-->
+  <!--<div [ngclass]="messageClass">-->
+    <!--{{ message }}-->
+  <!--</div>-->
+<!--</div>-->
+
+<button type="button" name="button" class="btn btn-warning" *ngIf="!newPost" (click)="newBlogForm()">New Post</button>
+<button [disabled]="loadingBlogs" type="button" name="button" class="btn btn-default" *ngIf="!newPost" (click)="reloadBlogs()"><span class="glyphicon glyphicon-repeat"></span>&nbsp;&nbsp;Reload</button>
+
+<br/>
+<br/>
+
+<div *ngIf="!newPost">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">Post Title</h3>
+    </div>
+    <div class="panel-body">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce in nulla et elit egestas finibus. Cras malesuada fringilla elit vel pellentesque. Maecenas mattis fringilla vehicula. Pellentesque id ipsum a tortor auctor sollicitudin. Donec lacinia aliquam vulputate. Phasellus vitae fringilla lorem. Integer non feugiat felis.
+    </div>
+    <div class="panel-footer">
+        <strong>Posted By: </strong>Eugene Kwon
+        <br/>
+        <strong>Date: </strong>8/31/2017
+        <br/>
+        <div>
+          <strong>Likes: </strong>25
+          <strong>Dislikes: </strong>5
+        </div>
+      <a href="#"><button type="button" name="button" class="btn btn-sm btn-info">Edit</button></a>
+      <a href="#"><button type="button" name="button" class="btn btn-sm btn-danger">Delete</button></a>
+      <div class="dropdown">
+        <button type="button" name="button" class="btn btn-sm btn-success">
+          <span class="glyphicon glyphicon-thumbs-up">&nbsp;</span>Likes: 21
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
