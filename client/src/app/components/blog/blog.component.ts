@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-blog',
@@ -12,9 +13,12 @@ export class BlogComponent implements OnInit {
   newPost = false;
   loadingBlogs = false;
   form;
+  processing = false;
+  username;
 
   constructor(
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private authService: AuthService
   ) {
     this.createNewBlogForm();
   }
@@ -35,6 +39,16 @@ export class BlogComponent implements OnInit {
     });
   }
 
+  enableFormNewBlogForm() {
+    this.form.get('title').disable();
+    this.form.get('body').disable();
+  }
+
+  disableFormNewBlogForm() {
+    this.form.get('title').enable();
+    this.form.get('body').enable();
+  }
+
   alphaNumericValidation(controls) {
     const regExp = new RegExp(/^[a-zA-Z0-9 ]+$/);
     if (regExp.test(controls.value)) {
@@ -42,6 +56,10 @@ export class BlogComponent implements OnInit {
     } else {
       return { 'alphaNumericValidation': true };
     }
+  }
+
+  goBack() {
+    window.location.reload();
   }
 
   newBlogForm() {
@@ -61,9 +79,18 @@ export class BlogComponent implements OnInit {
   }
 
   onBlogSubmit() {
-    console.log('form submitted');
+    this.processing = true;
+    this.disableFormNewBlogForm();
+    const blog = {
+      title: this.form.get('title').value,
+      body: this.form.get('body').value,
+      createdBy: this.username
+    };
   }
 
   ngOnInit() {
+    this.authService.getProfile().subscribe(profile => {
+      this.username = profile.user.username;
+    });
   }
 }
