@@ -33,6 +33,7 @@ const appRoutes: Routes = [
   {
     path: 'blog',
     component: BlogComponent, // Login Route
+    canActivate: [AuthGuard]
   },
   {
     path: 'profile',
