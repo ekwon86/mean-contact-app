@@ -88,7 +88,7 @@ export class BlogComponent implements OnInit {
       body: this.form.get('body').value,
       createdBy: this.username
     };
-    this.blogService.newBlog(blog).subscrobe(data => {
+    this.blogService.newBlog(blog).subscribe(data => {
       if (!data.success) {
         this.messageClass = 'alert alert-danger';
         this.message = data.message;
