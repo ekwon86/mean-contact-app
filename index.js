@@ -9,6 +9,7 @@ mongoose.Promise = global.Promise;
 const config = require('./config/database'); // Mongoose Config
 const path = require('path'); // NodeJS Package for file paths
 const authentication = require('./routes/authentication')(router); // Import Authentication Routes
+const blogs = require('./routes/blog')(router);
 const bodyParser = require('body-parser'); // Parse incoming request bodies in a middleware before your handlers, available under the req.body property.
 const cors = require('cors'); // CORS is a node.js package for providing a Connect/Express middleware that can be used to enable CORS with various options.
 
