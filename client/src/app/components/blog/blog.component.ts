@@ -47,7 +47,7 @@ export class BlogComponent implements OnInit {
         Validators.maxLength(500),
         Validators.minLength(5)
       ])]
-    })
+    });
   }
 
   // Create form for posting comments
@@ -58,7 +58,7 @@ export class BlogComponent implements OnInit {
         Validators.minLength(1),
         Validators.maxLength(200)
       ])]
-    })
+    });
   }
 
   // Enable the comment form
@@ -90,7 +90,7 @@ export class BlogComponent implements OnInit {
     if (regExp.test(controls.value)) {
       return null; // Return valid
     } else {
-      return { 'alphaNumericValidation': true } // Return error in validation
+      return { 'alphaNumericValidation': true }; // Return error in validation
     }
   }
 
@@ -134,7 +134,7 @@ export class BlogComponent implements OnInit {
       title: this.form.get('title').value, // Title field
       body: this.form.get('body').value, // Body field
       createdBy: this.username // CreatedBy field
-    }
+    };
 
     // Function to save blog into database
     this.blogService.newBlog(blog).subscribe(data => {
@@ -189,10 +189,41 @@ export class BlogComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    this.authService.getProfile().subscribe(profile => {
-      this.username = profile.user.username;
+  // Function to post a new comment
+  postComment(id) {
+    this.disableCommentForm(); // Disable form while saving comment to database
+    this.processing = true; // Lock buttons while saving comment to database
+    const comment = this.commentForm.get('comment').value; // Get the comment value to pass to service function
+    // Function to save the comment to the database
+    this.blogService.postComment(id, comment).subscribe(data => {
+      this.getAllBlogs(); // Refresh all blogs to reflect the new comment
+      const index = this.newComment.indexOf(id); // Get the index of the blog id to remove from array
+      this.newComment.splice(index, 1); // Remove id from the array
+      this.enableCommentForm(); // Re-enable the form
+      this.commentForm.reset(); // Reset the comment form
+      this.processing = false; // Unlock buttons on comment form
+      if (this.enabledComments.indexOf(id) < 0) this.expand(id); // Expand comments for user on comment submission
     });
-    this.getAllBlogs();
   }
+
+  // Expand the list of comments
+  expand(id) {
+    this.enabledComments.push(id); // Add the current blog post id to array
+  }
+
+  // Collapse the list of comments
+  collapse(id) {
+    const index = this.enabledComments.indexOf(id); // Get position of id in array
+    this.enabledComments.splice(index, 1); // Remove id from array
+  }
+
+  ngOnInit() {
+    // Get profile username on page load
+    this.authService.getProfile().subscribe(profile => {
+      this.username = profile.user.username; // Used when creating new blog posts and comments
+    });
+
+    this.getAllBlogs(); // Get all blogs on component load
+  }
+
 }
