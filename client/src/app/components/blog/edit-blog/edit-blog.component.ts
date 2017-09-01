@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { BlogService } from '../../../services/blog.service';
 
 @Component({
   selector: 'app-edit-blog',
@@ -8,20 +10,22 @@ import { Location } from '@angular/common';
 })
 export class EditBlogComponent implements OnInit {
 
-  message = false;
+  message;
   messageClass;
-  blog = {
-    title: String,
-    body: String
-  };
+  blog;
   processing = false;
+  currentUrl;
+  loading = true;
 
   constructor(
-    private location: Location
+    private location: Location,
+    private activatedRoute: ActivatedRoute,
+    private blogService: BlogService
   ) { }
 
   updateBlogSubmit() {
-
+    this.processing = true;
+    // function to update blog
   }
 
   goBack() {
@@ -29,6 +33,17 @@ export class EditBlogComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.currentUrl = this.activatedRoute.snapshot.params;
+    this.blogService.getSingleBlog(this.currentUrl.id).subscribe(data => {
+      if (!data.success) {
+        this.messageClass = 'alert alert-danger';
+        this.message = 'Blog not found';
+      } else {
+        this.blog = data.blog;
+        this.loading = false;
+
+      }
+    });
   }
 
 }

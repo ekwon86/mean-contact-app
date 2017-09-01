@@ -62,5 +62,27 @@ module.exports = (router) => {
         }).sort({ '_id': -1 }); // Sort by descending order (new on top)
     });
 
+    router.get('/singleBlog/:id', (req, res) => {
+       if(!req.params.id){
+           res.json({ success: false, message: 'No blog ID was provided' });
+       } else {
+           Blog.findOne({ _id: req.params.id }, (err, blog) => {
+               if (err) {
+                   res.json({ success: false, message: 'Not a valid blog id' });
+               } else {
+                   if (!blog) {
+                       res.json({ success: false, message: 'Blog not found,' });
+                   } else {
+                       res.json({ success: true, blog: blog });
+                   }
+               }
+           });
+       }
+    });
+
+    router.put('/updateBlog', (req, res) => {
+       res.send('test');
+    });
+
     return router;
 };
