@@ -9,110 +9,183 @@ import { BlogService } from '../../services/blog.service';
   styleUrls: ['./blog.component.css']
 })
 export class BlogComponent implements OnInit {
+
   messageClass;
   message;
   newPost = false;
   loadingBlogs = false;
   form;
+  commentForm;
   processing = false;
   username;
   blogPosts;
+  newComment = [];
+  enabledComments = [];
 
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private blogService: BlogService
   ) {
-    this.createNewBlogForm();
+    this.createNewBlogForm(); // Create new blog form on start up
+    this.createCommentForm(); // Create form for posting comments on a user's blog post
   }
 
+  // Function to create new blog form
   createNewBlogForm() {
     this.form = this.formBuilder.group({
+      // Title field
       title: ['', Validators.compose([
         Validators.required,
         Validators.maxLength(50),
         Validators.minLength(5),
         this.alphaNumericValidation
       ])],
+      // Body field
       body: ['', Validators.compose([
         Validators.required,
         Validators.maxLength(500),
         Validators.minLength(5)
       ])]
-    });
+    })
   }
 
+  // Create form for posting comments
+  createCommentForm() {
+    this.commentForm = this.formBuilder.group({
+      comment: ['', Validators.compose([
+        Validators.required,
+        Validators.minLength(1),
+        Validators.maxLength(200)
+      ])]
+    })
+  }
+
+  // Enable the comment form
+  enableCommentForm() {
+    this.commentForm.get('comment').enable(); // Enable comment field
+  }
+
+  // Disable the comment form
+  disableCommentForm() {
+    this.commentForm.get('comment').disable(); // Disable comment field
+  }
+
+  // Enable new blog form
   enableFormNewBlogForm() {
-    this.form.get('title').disable();
-    this.form.get('body').disable();
+    this.form.get('title').enable(); // Enable title field
+    this.form.get('body').enable(); // Enable body field
   }
 
+  // Disable new blog form
   disableFormNewBlogForm() {
-    this.form.get('title').enable();
-    this.form.get('body').enable();
+    this.form.get('title').disable(); // Disable title field
+    this.form.get('body').disable(); // Disable body field
   }
 
+  // Validation for title
   alphaNumericValidation(controls) {
-    const regExp = new RegExp(/^[a-zA-Z0-9 ]+$/);
+    const regExp = new RegExp(/^[a-zA-Z0-9 ]+$/); // Regular expression to perform test
+    // Check if test returns false or true
     if (regExp.test(controls.value)) {
-      return null;
+      return null; // Return valid
     } else {
-      return { 'alphaNumericValidation': true };
+      return { 'alphaNumericValidation': true } // Return error in validation
     }
   }
 
-  goBack() {
-    window.location.reload();
-  }
-
+  // Function to display new blog form
   newBlogForm() {
-    this.newPost = true;
+    this.newPost = true; // Show new blog form
   }
 
+  // Reload blogs on current page
   reloadBlogs() {
-    this.loadingBlogs = true;
-    // Get all blogs
+    this.loadingBlogs = true; // Used to lock button
+    this.getAllBlogs(); // Add any new blogs to the page
     setTimeout(() => {
-      this.loadingBlogs = false;
+      this.loadingBlogs = false; // Release button lock after four seconds
     }, 4000);
   }
 
-  draftComment() {
-
+  // Function to post a new comment on blog post
+  draftComment(id) {
+    this.commentForm.reset(); // Reset the comment form each time users starts a new comment
+    this.newComment = []; // Clear array so only one post can be commented on at a time
+    this.newComment.push(id); // Add the post that is being commented on to the array
   }
 
+  // Function to cancel new post transaction
+  cancelSubmission(id) {
+    const index = this.newComment.indexOf(id); // Check the index of the blog post in the array
+    this.newComment.splice(index, 1); // Remove the id from the array to cancel post submission
+    this.commentForm.reset(); // Reset  the form after cancellation
+    this.enableCommentForm(); // Enable the form after cancellation
+    this.processing = false; // Enable any buttons that were locked
+  }
+
+  // Function to submit a new blog post
   onBlogSubmit() {
-    this.processing = true;
-    this.disableFormNewBlogForm();
+    this.processing = true; // Disable submit button
+    this.disableFormNewBlogForm(); // Lock form
+
+    // Create blog object from form fields
     const blog = {
-      title: this.form.get('title').value,
-      body: this.form.get('body').value,
-      createdBy: this.username
-    };
+      title: this.form.get('title').value, // Title field
+      body: this.form.get('body').value, // Body field
+      createdBy: this.username // CreatedBy field
+    }
+
+    // Function to save blog into database
     this.blogService.newBlog(blog).subscribe(data => {
+      // Check if blog was saved to database or not
       if (!data.success) {
-        this.messageClass = 'alert alert-danger';
-        this.message = data.message;
-        this.processing = false;
-        this.enableFormNewBlogForm();
+        this.messageClass = 'alert alert-danger'; // Return error class
+        this.message = data.message; // Return error message
+        this.processing = false; // Enable submit button
+        this.enableFormNewBlogForm(); // Enable form
       } else {
-        this.messageClass = 'alert alert-success';
-        this.message = data.message;
+        this.messageClass = 'alert alert-success'; // Return success class
+        this.message = data.message; // Return success message
         this.getAllBlogs();
+        // Clear form data after two seconds
         setTimeout(() => {
-          this.newPost = false;
-          this.processing = false;
-          this.message = false;
-          this.form.reset();
-          this.enableFormNewBlogForm();
+          this.newPost = false; // Hide form
+          this.processing = false; // Enable submit button
+          this.message = false; // Erase error/success message
+          this.form.reset(); // Reset all form fields
+          this.enableFormNewBlogForm(); // Enable the form fields
         }, 2000);
       }
     });
   }
 
+  // Function to go back to previous page
+  goBack() {
+    window.location.reload(); // Clear all variable states
+  }
+
+  // Function to get all blogs from the database
   getAllBlogs() {
+    // Function to GET all blogs from database
     this.blogService.getAllBlogs().subscribe(data => {
-      this.blogPosts = data.blogs;
+      this.blogPosts = data.blogs; // Assign array to use in HTML
+    });
+  }
+
+  // Function to like a blog post
+  likeBlog(id) {
+    // Service to like a blog post
+    this.blogService.likeBlog(id).subscribe(data => {
+      this.getAllBlogs(); // Refresh blogs after like
+    });
+  }
+
+  // Function to disliked a blog post
+  dislikeBlog(id) {
+    // Service to dislike a blog post
+    this.blogService.dislikeBlog(id).subscribe(data => {
+      this.getAllBlogs(); // Refresh blogs after dislike
     });
   }
 

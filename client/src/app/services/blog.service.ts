@@ -49,9 +49,21 @@ export class BlogService {
     return this.http.put(this.domain + 'blogs/updateBlog/', blog, this.options).map(res => res.json());
   }
 
+  // Function to delete a blog
   deleteBlog(id) {
-    this.createAuthenticationHeaders();
+    this.createAuthenticationHeaders(); // Create headers
     return this.http.delete(this.domain + 'blogs/deleteBlog/' + id, this.options).map(res => res.json());
   }
 
+  // Function to like a blog post
+  likeBlog(id) {
+    const blogData = { id: id };
+    return this.http.put(this.domain + 'blogs/likeBlog/', blogData, this.options).map(res => res.json());
+  }
+
+  // Function to dislike a blog post
+  dislikeBlog(id) {
+    const blogData = { id: id };
+    return this.http.put(this.domain + 'blogs/dislikeBlog/', blogData, this.options).map(res => res.json());
+  }
 }
