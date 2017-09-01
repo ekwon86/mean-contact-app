@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions } from '@angular/http';
 import { AuthService } from './auth.service';
+import { Http, Headers, RequestOptions } from '@angular/http';
 
 @Injectable()
 export class BlogService {
@@ -25,18 +25,28 @@ export class BlogService {
     });
   }
 
+  // Function to create a new blog post
   newBlog(blog) {
-    this.createAuthenticationHeaders();
+    this.createAuthenticationHeaders(); // Create headers
     return this.http.post(this.domain + 'blogs/newBlog', blog, this.options).map(res => res.json());
   }
 
+  // Function to get all blogs from the database
   getAllBlogs() {
-    this.createAuthenticationHeaders();
+    this.createAuthenticationHeaders(); // Create headers
     return this.http.get(this.domain + 'blogs/allBlogs', this.options).map(res => res.json());
   }
 
+  // Function to get the blog using the id
   getSingleBlog(id) {
-    this.createAuthenticationHeaders();
+    this.createAuthenticationHeaders(); // Create headers
     return this.http.get(this.domain + 'blogs/singleBlog/' + id, this.options).map(res => res.json());
   }
+
+  // Function to edit/update blog post
+  editBlog(blog) {
+    this.createAuthenticationHeaders(); // Create headers
+    return this.http.put(this.domain + 'blogs/updateBlog/', blog, this.options).map(res => res.json());
+  }
+
 }
